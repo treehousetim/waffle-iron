@@ -1,0 +1,32 @@
+# Runs tests/install-test.sh on macOS (its stock bash 3.2) and Linux.
+#
+# It runs files from strangers' pull requests, so: `pull_request` only (never
+# `pull_request_target`), read-only permissions, no secrets, and every action
+# pinned to a full commit hash (CONTRIBUTING.md, "Keeping the catalogue itself
+# safe").
+
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: install.sh and iron
+        run: /bin/bash tests/install-test.sh
+      - name: index.json parses
+        run: python3 -m json.tool index.json > /dev/null

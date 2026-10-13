@@ -103,6 +103,10 @@ Whoever can change `index.json` on `main` decides what agents install, so:
   and its history cannot be rewritten or the branch deleted (a repository
   ruleset).
 - The maintainers' GitHub accounts use two-factor authentication.
-- No GitHub Actions run here. If a format check is ever added, it runs on
-  `pull_request`, never `pull_request_target`, and is given no secrets: it
-  would be running files from a stranger's pull request.
+- `install.sh` runs on people's machines from a copy-paste line, so a change
+  to it is read as carefully as a module, and `tests/install-test.sh` names
+  a failure-list number for every behaviour it changes.
+- The one workflow, `.github/workflows/test.yml`, runs those tests on macOS
+  and Linux. It runs on `pull_request`, never `pull_request_target`, with
+  read-only permissions, no secrets, and actions pinned to a full commit
+  hash: it runs files from a stranger's pull request.

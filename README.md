@@ -26,6 +26,43 @@ a fresh app from its files alone and the whole suite came out green at 100%
 coverage. `none` means nobody has done that yet: the module may well work, but
 it is unproven.
 
+## Install iron
+
+`iron` adds modules to a Waffle app from anywhere inside it:
+
+```bash
+cd ~/sites/acme
+iron use short-links
+```
+
+Install it once per machine. Paste this into a terminal:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/treehousetim/waffle-iron/main/install.sh)"
+```
+
+Or download [`install.sh`](install.sh), read it, and run it:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/treehousetim/waffle-iron/main/install.sh
+less install.sh && bash install.sh
+```
+
+It writes one file, `~/.local/bin/iron` (`--to <dir>` for another
+directory). It needs no sudo, never replaces an `iron` it did not write, and
+never edits your shell profile; if the directory is not on your PATH it
+prints the line to add. Run it again to update.
+
+`iron` holds no logic of its own. It finds the app you are in and runs that
+app's `./tools/module.sh`, which does every check below before anything is
+built: the catalogue, the pinned commit, the hash, the files themselves, and
+the full test suite before the install is recorded. So `iron` runs the module
+command of whichever project you are in, as `npm run` would: use it in your
+own apps. An app started from a Waffle without `tools/module.sh` gets a
+message saying so.
+
+macOS and Linux, and Windows inside WSL2.
+
 ## For agents
 
 The machine-readable catalogue is [`index.json`](index.json):
