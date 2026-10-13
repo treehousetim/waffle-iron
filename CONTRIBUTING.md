@@ -95,6 +95,21 @@ If a listed version turns out to be harmful or broken, add
 skip yanked versions. Entries are never deleted, so an app's `modules.json`
 always points at something that can be looked up.
 
+## Raising the schema
+
+`index.json`'s `schema` (now 1) is how the catalogue retires old copies of
+Waffle's `tools/module.sh`. Every Waffle app carries the copy it was started
+with, and a copy that does not know the schema refuses to install, saying to
+update it from Waffle. Raise it, in the same pull request, when:
+
+- the file's format changes in a way an older command would misread, or
+- Waffle's module command gains a check that must not be skipped, so modules
+  listed from now on may rely on it.
+
+Ship the Waffle release that knows the new schema first, then raise it here.
+Do not raise it for anything an older command handles correctly: it stops
+every app that has not updated.
+
 ## Keeping the catalogue itself safe
 
 Whoever can change `index.json` on `main` decides what agents install, so:

@@ -71,11 +71,16 @@ The machine-readable catalogue is [`index.json`](index.json):
 https://raw.githubusercontent.com/treehousetim/waffle-iron/main/index.json
 ```
 
-To install a module from it:
+In a Waffle app, install with the module command, `iron use <name>` or
+`./tools/module.sh use <name>` (Waffle's `docs/module-command.md`). It does
+every step below and more, and is tested. The steps are what it does, and
+what an agent does by hand in an app that does not have it:
 
 1. Find the module and pick a version whose `waffle` constraint matches the
-   app's `VERSION`. Skip any version with `"reviewed-by": null` or a `yanked`
-   field.
+   Waffle version the app was started from: the "Started from
+   treehousetim/waffle vX.Y.Z" line in its `CHANGELOG.md` (an app's own
+   `VERSION` is its own release number, not Waffle's). Skip any version with
+   `"reviewed-by": null` or a `yanked` field.
 2. Fetch the files at the pinned `commit`, from `source.path` in
    `source.repository` (or the file at `source.url` for the `zip` and `file`
    forms), into a scratch directory outside the app. For a repository, export
@@ -122,8 +127,15 @@ it and what the reviewer checks.
 }
 ```
 
+- `schema` is the version of this file's format and of the checks it
+  expects. Waffle's `tools/module.sh` knows schema 1, and refuses a newer one
+  with "update tools/module.sh from Waffle", so raising it retires every
+  older copy of the command at once ([CONTRIBUTING.md](CONTRIBUTING.md#raising-the-schema)).
 - `name`, `title`, `summary`, `author`, `license`, `waffle` and `proven-on`
   match the module's own front matter at that version.
+- `source.repository` is `https://<host>/<owner>/<repo>`, `commit` is 40 hex
+  characters, and `path` is `.` or a relative path with no `..`; the command
+  refuses an entry that is not.
 - `form` is how the module is shared (Waffle's `docs/modules.md`, "Forms").
   For `zip` and `file`, `source` is `{ "url": "…" }` instead, and the URL must
   never change what it serves.
