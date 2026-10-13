@@ -41,10 +41,14 @@ To install a module from it:
    field.
 2. Fetch the files at the pinned `commit`, from `source.path` in
    `source.repository` (or the file at `source.url` for the `zip` and `file`
-   forms).
-3. Compute the SHA-256 the way [Hashing](#hashing) describes. If it differs
+   forms), into a scratch directory outside the app.
+3. Unpack a `.zip` there too, and refuse it if any entry has an absolute path,
+   a `..` segment or a symlink, or if it unpacks to more than 10 MB.
+4. Refuse the module if it contains a symlink, or a file whose name has
+   anything but printable ASCII in it (see [Hashing](#hashing)).
+5. Compute the SHA-256 the way [Hashing](#hashing) describes. If it differs
    from `sha256`, stop and tell the owner. Do not install.
-4. Install by `docs/modules.md` in the app, starting with "show before
+6. Install by `docs/modules.md` in the app, starting with "show before
    building". Record the name, version, source and SHA-256 in the app's
    `modules.json`.
 
@@ -97,6 +101,15 @@ hashed again. From inside the module's directory:
 
 ```bash
 find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256
+```
+
+The hash only covers regular files, and one line per file only works for
+plain names, so a module may contain neither symlinks nor file names with
+anything but printable ASCII. Both of these must print nothing:
+
+```bash
+find . -type l
+LC_ALL=C find . -name '*[![:print:]]*'
 ```
 
 On Linux, `sha256sum` prints the same lines and can stand in for

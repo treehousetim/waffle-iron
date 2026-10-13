@@ -12,12 +12,14 @@
 
 ### Reviewer (CONTRIBUTING.md, "What the reviewer checks")
 
-- [ ] 1. Entry matches the files, and the hash checks out.
-- [ ] 2. Format check passes.
+- [ ] Read as raw text from a fresh clone; the commit is on one of the repository's own branches.
+- [ ] 1. Entry matches the files, the hash checks out, and the diff touches only this entry.
+- [ ] 2. Format check passes; the name is not a near-copy of a listed one.
 - [ ] 3. Nothing AGENTS.md forbids: libraries, secrets, unprotected routes, weakened tests.
 - [ ] 4. No step reaches the network, secrets, Doppler, GitHub or the server.
 - [ ] 5. Data model follows AGENTS.md §6; migrations only add.
 - [ ] 6. Every failure is covered by an outcome.
 - [ ] 7. `tests/` and `reference/` agree with MODULE.md.
 - [ ] 8. `proven-on` claims have artifacts.
+- [ ] 9. Nothing hidden: no symlinks, odd file names, unexplained HTML comments or non-ASCII characters.
 - [ ] `reviewed-by` and `listed` filled in.

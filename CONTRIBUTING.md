@@ -35,12 +35,37 @@ request checklist; it is the reviewer's list too.
 
 ## What the reviewer checks
 
-The reviewer reads the module at the pinned commit, all of it, and checks:
+The reviewer reads the module at the pinned commit, all of it, **as raw
+text**: in an editor or GitHub's "Raw" view, never only the rendered page. An
+agent reads every byte, including HTML comments, zero-width characters and
+bidirectional controls that a rendered page hides, and that is where an
+injected instruction would be put.
+
+Start from a fresh clone, not a fork or a link someone sent:
+
+```bash
+git clone --quiet <repository> module && cd module
+git branch -r --contains <commit>   # must list a branch: the commit is this repository's, not a fork's
+git checkout --quiet <commit> && cd <path>
+find . -type l                      # must print nothing: no symlinks
+LC_ALL=C find . -name '*[![:print:]]*'           # must print nothing: plain file names
+grep -rn '<!--' .                                # read every hit
+LC_ALL=C grep -rn '[^[:print:][:space:]]' .      # every non-ASCII character must have a reason
+find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256   # must equal sha256
+```
+
+GitHub serves a fork's commits under the original repository's URL, so a
+commit that is only reachable through a link may not be the author's at all.
+A fresh clone only has the repository's own commits.
+
+Then the reviewer checks:
 
 1. **The entry matches the files.** The hash is right, and `name`, `title`,
    `summary`, `author`, `license`, `waffle` and `proven-on` match the front
-   matter.
-2. **The format check passes.**
+   matter. The pull request changes this one entry and its README row, and
+   nothing else: no other module's hash, commit or source.
+2. **The format check passes.** The name is new and not a near-copy of a
+   listed one (`short-link` beside `short-links`).
 3. **Nothing in it asks for what Waffle's `AGENTS.md` forbids:** a library
    that is not on the approved list, a secret with a default or in a file, a
    route without a permission, a skipped or weakened test.
@@ -52,6 +77,12 @@ The reviewer reads the module at the pinned commit, all of it, and checks:
 7. **Shipped `tests/` and `reference/` agree** with `MODULE.md`, and contain
    nothing beyond what it describes.
 8. **The claims are true:** a `proven-on` entry has its E2E artifact.
+9. **Nothing is hidden.** The checks above print nothing unexplained, and the
+   raw text says nothing the rendered page does not.
+
+A `.zip` is unpacked into a scratch directory first, and refused if any entry
+has an absolute path, a `..` segment or a symlink, or if it unpacks to more
+than 10 MB.
 
 Then the reviewer sets `reviewed-by` to their GitHub username, sets `listed`
 to the merge date, and merges.
@@ -62,3 +93,15 @@ If a listed version turns out to be harmful or broken, add
 `"yanked": "<one line saying why>"` to it, and say so in the README row. Agents
 skip yanked versions. Entries are never deleted, so an app's `modules.json`
 always points at something that can be looked up.
+
+## Keeping the catalogue itself safe
+
+Whoever can change `index.json` on `main` decides what agents install, so:
+
+- `main` takes changes only through pull requests, the maintainer's included,
+  and its history cannot be rewritten or the branch deleted (a repository
+  ruleset).
+- The maintainers' GitHub accounts use two-factor authentication.
+- No GitHub Actions run here. If a format check is ever added, it runs on
+  `pull_request`, never `pull_request_target`, and is given no secrets: it
+  would be running files from a stranger's pull request.
