@@ -19,7 +19,7 @@ before it is merged.
 
 | Module | Version | Waffle | Proven on | Summary |
 | --- | --- | --- | --- | --- |
-| [short-links](https://github.com/treehousetim/waffle/tree/b6868359e718c37fd2c927820d2c498b0060f968/modules/short-links) | 1.0.0 | `>=0.1 <1.0` | none | Your own short links (yoursite.com/go/spring-sale) that redirect where you point them, with a daily click count and nothing tracked about the people who click. *Awaiting review.* |
+| [short-links](https://github.com/treehousetim/waffle-short-links/tree/86dc06af62fa365e329e8999c0085fbf5738b013) | 1.0.0 | `>=0.1 <1.0` | none | Your own short links (yoursite.com/go/spring-sale) that redirect where you point them, with a daily click count and nothing tracked about the people who click. *Awaiting review.* |
 
 "Proven on" lists the Waffle versions where the module has been installed into
 a fresh app from its files alone and the whole suite came out green at 100%
