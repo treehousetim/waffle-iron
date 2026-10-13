@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "modules": {
+    "short-links": {
+      "title": "Short links",
+      "summary": "Your own short links (yoursite.com/go/spring-sale) that redirect where you point them, with a daily click count and nothing tracked about the people who click.",
+      "author": "treehousetim",
+      "license": "MIT",
+      "versions": {
+        "1.0.0": {
+          "waffle": ">=0.1 <1.0",
+          "form": "directory",
+          "source": {
+            "repository": "https://github.com/treehousetim/waffle",
+            "commit": "b6868359e718c37fd2c927820d2c498b0060f968",
+            "path": "modules/short-links"
+          },
+          "sha256": "b38400449a70a723fc7d99a73c0a04f743bcc6378bf9850df247c328963f20cd",
+          "proven-on": [],
+          "reviewed-by": null,
+          "listed": "2026-10-13"
+        }
+      }
+    }
+  }
+}
