@@ -26,6 +26,43 @@ a fresh app from its files alone and the whole suite came out green at 100%
 coverage. `none` means nobody has done that yet: the module may well work, but
 it is unproven.
 
+## Install iron
+
+`iron` adds modules to a Waffle app from anywhere inside it:
+
+```bash
+cd ~/sites/acme
+iron use short-links
+```
+
+Install it once per machine. Paste this into a terminal:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/treehousetim/waffle-iron/main/install.sh)"
+```
+
+Or download [`install.sh`](install.sh), read it, and run it:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/treehousetim/waffle-iron/main/install.sh
+less install.sh && bash install.sh
+```
+
+It writes one file, `~/.local/bin/iron` (`--to <dir>` for another
+directory). It needs no sudo, never replaces an `iron` it did not write, and
+never edits your shell profile; if the directory is not on your PATH it
+prints the line to add. Run it again to update.
+
+`iron` holds no logic of its own. It finds the app you are in and runs that
+app's `./tools/module.sh`, which does every check below before anything is
+built: the catalogue, the pinned commit, the hash, the files themselves, and
+the full test suite before the install is recorded. So `iron` runs the module
+command of whichever project you are in, as `npm run` would: use it in your
+own apps. An app started from a Waffle without `tools/module.sh` gets a
+message saying so.
+
+macOS and Linux, and Windows inside WSL2.
+
 ## For agents
 
 The machine-readable catalogue is [`index.json`](index.json):
@@ -34,11 +71,16 @@ The machine-readable catalogue is [`index.json`](index.json):
 https://raw.githubusercontent.com/treehousetim/waffle-iron/main/index.json
 ```
 
-To install a module from it:
+In a Waffle app, install with the module command, `iron use <name>` or
+`./tools/module.sh use <name>` (Waffle's `docs/module-command.md`). It does
+every step below and more, and is tested. The steps are what it does, and
+what an agent does by hand in an app that does not have it:
 
 1. Find the module and pick a version whose `waffle` constraint matches the
-   app's `VERSION`. Skip any version with `"reviewed-by": null` or a `yanked`
-   field.
+   Waffle version the app was started from: the "Started from
+   treehousetim/waffle vX.Y.Z" line in its `CHANGELOG.md` (an app's own
+   `VERSION` is its own release number, not Waffle's). Skip any version with
+   `"reviewed-by": null` or a `yanked` field.
 2. Fetch the files at the pinned `commit`, from `source.path` in
    `source.repository` (or the file at `source.url` for the `zip` and `file`
    forms), into a scratch directory outside the app. For a repository, export
@@ -85,8 +127,15 @@ it and what the reviewer checks.
 }
 ```
 
+- `schema` is the version of this file's format and of the checks it
+  expects. Waffle's `tools/module.sh` knows schema 1, and refuses a newer one
+  with "update tools/module.sh from Waffle", so raising it retires every
+  older copy of the command at once ([CONTRIBUTING.md](CONTRIBUTING.md#raising-the-schema)).
 - `name`, `title`, `summary`, `author`, `license`, `waffle` and `proven-on`
   match the module's own front matter at that version.
+- `source.repository` is `https://<host>/<owner>/<repo>`, `commit` is 40 hex
+  characters, and `path` is `.` or a relative path with no `..`; the command
+  refuses an entry that is not.
 - `form` is how the module is shared (Waffle's `docs/modules.md`, "Forms").
   For `zip` and `file`, `source` is `{ "url": "…" }` instead, and the URL must
   never change what it serves.

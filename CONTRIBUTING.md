@@ -95,6 +95,21 @@ If a listed version turns out to be harmful or broken, add
 skip yanked versions. Entries are never deleted, so an app's `modules.json`
 always points at something that can be looked up.
 
+## Raising the schema
+
+`index.json`'s `schema` (now 1) is how the catalogue retires old copies of
+Waffle's `tools/module.sh`. Every Waffle app carries the copy it was started
+with, and a copy that does not know the schema refuses to install, saying to
+update it from Waffle. Raise it, in the same pull request, when:
+
+- the file's format changes in a way an older command would misread, or
+- Waffle's module command gains a check that must not be skipped, so modules
+  listed from now on may rely on it.
+
+Ship the Waffle release that knows the new schema first, then raise it here.
+Do not raise it for anything an older command handles correctly: it stops
+every app that has not updated.
+
 ## Keeping the catalogue itself safe
 
 Whoever can change `index.json` on `main` decides what agents install, so:
@@ -103,6 +118,10 @@ Whoever can change `index.json` on `main` decides what agents install, so:
   and its history cannot be rewritten or the branch deleted (a repository
   ruleset).
 - The maintainers' GitHub accounts use two-factor authentication.
-- No GitHub Actions run here. If a format check is ever added, it runs on
-  `pull_request`, never `pull_request_target`, and is given no secrets: it
-  would be running files from a stranger's pull request.
+- `install.sh` runs on people's machines from a copy-paste line, so a change
+  to it is read as carefully as a module, and `tests/install-test.sh` names
+  a failure-list number for every behaviour it changes.
+- The one workflow, `.github/workflows/test.yml`, runs those tests on macOS
+  and Linux. It runs on `pull_request`, never `pull_request_target`, with
+  read-only permissions, no secrets, and actions pinned to a full commit
+  hash: it runs files from a stranger's pull request.
