@@ -44,9 +44,10 @@ injected instruction would be put.
 Start from a fresh clone, not a fork or a link someone sent:
 
 ```bash
-git clone --quiet <repository> module && cd module
-git branch -r --contains <commit>   # must list a branch: the commit is this repository's, not a fork's
-git checkout --quiet <commit> && cd <path>
+git clone --quiet <repository> clone
+git -C clone branch -r --contains <commit>   # must list a branch: the commit is this repository's, not a fork's
+mkdir module && git -C clone archive <commit> <path> | tar -x -C module && cd module/<path>
+                                    # the files at the commit, without the clone's .git/
 find . -type l                      # must print nothing: no symlinks
 LC_ALL=C find . -name '*[![:print:]]*'           # must print nothing: plain file names
 grep -rn '<!--' .                                # read every hit

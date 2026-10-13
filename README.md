@@ -41,7 +41,8 @@ To install a module from it:
    field.
 2. Fetch the files at the pinned `commit`, from `source.path` in
    `source.repository` (or the file at `source.url` for the `zip` and `file`
-   forms), into a scratch directory outside the app.
+   forms), into a scratch directory outside the app. For a repository, export
+   them as [Hashing](#hashing) shows rather than using a clone's working copy.
 3. Unpack a `.zip` there too, and refuse it if any entry has an absolute path,
    a `..` segment or a symlink, or if it unpacks to more than 10 MB.
 4. Refuse the module if it contains a symlink, or a file whose name has
@@ -100,6 +101,18 @@ module's directory, sorted by path, hashed one per line, and that output
 hashed again. From inside the module's directory:
 
 ```bash
+find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256
+```
+
+Every file counts, hidden ones included, so hash exactly the files at the
+pinned commit and nothing else. Not a clone's working copy: when the module is
+at the repository's root (`"path": "."`) its `.git/` would be hashed too, and
+that differs from clone to clone. Not a folder a desktop has added a
+`.DS_Store` to. Export the commit and hash that:
+
+```bash
+mkdir module && git -C <clone> archive <commit> <path> | tar -x -C module
+cd module/<path>
 find . -type f -print0 | LC_ALL=C sort -z | xargs -0 shasum -a 256 | shasum -a 256
 ```
 
